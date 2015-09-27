@@ -6,7 +6,9 @@ output: pdf_document
 #Executive Summary
 Is having an automatic or manual transmission better for fuel efficiency (mpg), and by how much? The simple answer is that the average mpg is 17.14 for automatic transmissions, and 42% more (24.4mpg) for manual, so manual transmission does seem to be better for fuel efficiency. If we wanted to use this model alone for predicting fuel efficiency, we would expect 95% of the time the actual mpg would be within the range of 14.9 - 19.4 mpg for automatic and 18.5 - 30.3 mpg for manual transmissions.
 However, if we look at other factors such as the weight of the car, the answer is not that straight forward. First, car weight is a much better predictor of fuel efficiency than transmission type is; and second, there is a tendency for low-weight cars to have manual transmissions. 
+
 With this in mind, we used a model where weight, transmission type and their interaction was considered, and this model explained more of the variation in fuel efficiency than our original model.  For automatic transmission, each 1000 lb increase in car weight was predicted to result in a 3.8 miles per gallon reduction in fuel efficiency, while for manual transmission the reduction was much larger, close to 9.1 mpg. We can be 95% confident that our predictions for mpg fuel efficiency reduction for each 1000lb of car weight is within the range of 2.2 and 5.4 mpg for automatic transmissions, and within the range of 4.5 to 13.7 mpg for manual transmissions.
+
 In conclusion, it seems that automatic transmission is better for fuel efficiency, but other factors (such as weight) have even more effect on mpg than the transmission type.
 
 
@@ -20,16 +22,12 @@ fit_am <-lm(mpg~factor(am),mtcars); summary(fit_am)$coef
 
 According to the results, cars with automatic transmission (*am*=0) average 17.147 miles per gallon, while cars with manual transmission average 17.147+7.245=24.392 mpg; the p values are small enough that we can say with 95% confidence that the averages are not 0. Unfortunately, the variation in mpg explained by this model (R^2^) is about 36\%, which suggests that there is more to the story. In addition, plotting the model residuals (see **Figure 1B** in Appendix) suggests that the model may be heteroskedastic, i.e. the prediction accuracy for manual transmission is lower than the prediction accuracy for automatic transmission.
 
-Therefore let's examine the other variables in the **mtcars** data set to see if including one or more ofthem could improve our model. **Figure 2** in the Appendix shows the plots and correlations between each of the variable pairs in the **mtcars** data set.
-
-The first thing to notice is that the variable *am* (automatic/manual) is not as highly correlated to *mpg* (.6), as some of the other variables in the data set. If other variables can explain the variation in *mpg* better, then that variation should be removed before we consider the effects of "am". The top four variables having the highest absolute correlation with mpg (miles per gallon) are: *wt* (weight) -> -0.868; *cyl* (number of cylinders) -> -0.852; *disp* (displacement cu. in.) -> -0.848; and *hp* (horsepower) -> -0.776. Visually examinig their pair plots with *mpg* confirms that these four variables are all similarly negatively correlated with *mpg*. The last three variables are indicators of engine size and power, and therefore it is not surprising that they are also highly positively correlated with each other (in the .8-.9 range). It also makes sense that the weight of the car is correlated with engine power, as the heavier the car the more engine power required to move it -- and indeed, correlations are in the range of .65-.9. That given, the variable *wt* (weight), having the highest correlation with *mpg* and also highly correlated engine power indicator variables, was chosen to be examined in models with and without *am*.  
+Therefore let's examine the other variables in the **mtcars** data set to see if including one or more ofthem could improve our model. **Figure 2** in the Appendix shows the plots and correlations between each of the variable pairs in the **mtcars** data set. The first thing to notice is that the variable *am* (automatic/manual) is not as highly correlated to *mpg* (.6), as some of the other variables in the data set. If other variables can explain the variation in *mpg* better, then that variation should be removed before we consider the effects of *am*. The top four variables having the highest absolute correlation with mpg (miles per gallon) are: *wt* (weight) -> -0.868; *cyl* (number of cylinders) -> -0.852; *disp* (displacement cu. in.) -> -0.848; and *hp* (horsepower) -> -0.776. Visually examinig their pair plots with *mpg* confirms that these four variables are all similarly negatively correlated with *mpg*. The last three variables are indicators of engine size and power, and therefore it is not surprising that they are also highly positively correlated with each other (in the .8-.9 range). It also makes sense that the weight of the car is correlated with engine power, as the heavier the car the more engine power required to move it -- and indeed, correlations are in the range of .65-.9. That given, the variable *wt* (weight), having the highest correlation with *mpg* and also highly correlated engine power indicator variables, was chosen to be examined in models with and without *am*.  
 
 ```{r}
 fit_wt <- lm(mpg~wt,mtcars)
 ```
-More than 75% of the mpg variation is explained by the car weight alone (R^2^=.7528 in mpg~wt model regression). **Figure 3A** shows the data points and the fitted line of the model. Plotting the residuals (see **Figure 3B**) reveals that there is a slight pattern: the residuals at the low and high end of weight are consistently positive.  This means that predictions using this model our predictions would be underestimated at the low and high end of car weight spectrum. Could this pattern be accounted for by the variable we are interested it, the transmission type?
-
-To answer this question, we have fitten a multivariate model of *mpg* vs *wt* plus *am*.  The result of this model should be two parallel lines, one intercept for predicting mpg for automatic, and another one for manual transmission.
+More than 75% of the mpg variation is explained by the car weight alone (R^2^=.7528 in mpg~wt model regression). **Figure 3A** shows the data points and the fitted line of the model. Plotting the residuals (see **Figure 3B**) reveals that there is a slight pattern: the residuals at the low and high end of weight are consistently positive.  This means that predictions using this model our predictions would be underestimated at the low and high end of car weight spectrum. Could this pattern be accounted for by the variable we are interested it, the transmission type? To answer this question, we have fitten a multivariate model of *mpg* vs *wt* plus *am*.  The result of this model should be two parallel lines, one intercept for predicting mpg for automatic, and another one for manual transmission.
 
 ```{r}
 fit2 <- lm(mpg~wt+factor(am),mtcars)
@@ -54,10 +52,8 @@ ci<-confint(fitx,level=.95);c(ci[2,1],ci[2,2]);c(ci[2,1]+ci[4,1],ci[2,2]+ci[4,2]
 ```
 We are 95% confident that mpg fuel efficiency reduction for each 1000lb of car weight is within the range of 2.2 and 5.4 mpg for automatic transmissions, and within the range of 4.5 to 13.7 mpg for manual transmissions.
 
-
-
 ##Note
-This document was produced by R markdown. The corresponding .Rmd file is available at .
+This document was produced by R markdown. The corresponding .Rmd file is available at github.com/nexkkkkkkkkk/regress.
 
 #Appendix
 ##Simple linear model: mpg vs am
